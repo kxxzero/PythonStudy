@@ -1,0 +1,51 @@
+{% extends 'main/main.html' %}
+{% block content %}
+
+<div class="wrapper row3" id="app">
+  <main class="container clear">
+      <h2 class="sectiontitle">쉐프 목록</h2>
+
+  </main>
+</div>
+
+<script>
+    let chefApp=Vue.createApp({
+        delimiters:['[[',']]'],
+        data(){
+            return {
+                chef_list:[],
+                curpage:1,
+                totalpage:0
+            }
+        },
+        mounted(){
+
+        },
+        method:{
+            dataRecv(){
+                axios.get('http://localhost:8000/web/recipe/chef_vue', {
+                    params:{
+                        page:this.curpage
+                    }
+                }).then(res=>{
+                    console.log(res.data)
+                    this.chef_list=res.data.chef_list
+                    this.curpage=res.data.curpage
+                    this.totalpage=res.data.totalpage
+
+                })
+            },
+            prev(){
+                this.curpage=this.curpage>1?this.curpage-1:this.curpage
+                this.dataRecv()
+            },
+            next(){
+                this.curpage=this.curpage<this.totalpage?this.curpage+1:this.curpage
+                this.dataRecv()
+            }
+        }
+    }).mount('#app')
+
+</script>
+
+{% endblock %}

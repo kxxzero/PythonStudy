@@ -1,0 +1,101 @@
+{% extends 'main/main.html' %}
+{% block content %}
+
+<div class="wrapper row3" id="app">
+  <main class="container clear">
+    <div class="content">
+      <div id="gallery">
+        <figure>
+          <header class="heading">레시피 목록</header>
+          <ul class="nospace clear">
+              <li v-for="recipe, index in recipe_list" :class="index%4==0?'one_quarter first':'one_quarter'"><a class="link" @click="recipe_detail(recipe.no)"><img :src="recipe.poster" :title="recipe.title"></a></li>
+          </ul>
+        </figure>
+      </div>
+      <nav class="pagination">
+        <ul>
+          <li v-if="startPage>1"><a class="link" @click="prev()">&laquo; Previous</a></li>
+          <li v-for="i in range(startPage, endPage)" :class="i===curpage?'current':''"><a class="link" @click="pageChange(i)">[[i]]</a></li>
+          <li v-if="endPage<totalpage"><a class="link" @click="next()">Next &raquo;</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="clear"></div>
+  </main>
+</div>
+
+<script>
+  let recipeApp=Vue.createApp({
+    delimiters:['[[',']]'],
+    data(){
+      return {
+        recipe_list:[],
+        curpage:1,
+        startPage:0,
+        endPage:0,
+        totalpage:0,
+        detail:{},
+        posters:[],
+        make:[],
+        stuff:[]
+      }
+    },
+
+    mounted(){
+      this.recipe_change()
+    },
+
+    methods:{
+      recipe_detail(){
+        axios.get('http://localhost:8000/web/recipe/detail_vue/',{
+          params:{
+            no:no
+          }
+        }).then(res=>{
+          console.log(res.data)
+          this.detail=res.data.detail
+          this.posters=res.data.posters
+          this.make=res.data.make
+          this.stuff=res.data.stuff
+        })
+      },
+      recipe_change(){
+        axios.get('http://localhost:8000/web/recipe/list_vue', {
+          params:{
+            page:this.curpage
+          }
+        }).then(res=>{
+          console.log(res.data)
+          this.recipe_list=res.data.recipe_list
+          this.curpage=res.data.curpage
+          this.totalpage=res.data.totalpage
+          this.startPage=res.data.startPage
+          this.endPage=res.data.endPage
+        })
+      },
+      range(start, end) {
+        let arr=[]
+        let lang=end-start
+        for(let i=0; i<=(end-start); i++) {
+          arr[i]=start
+          start++
+        }
+        return arr
+      },
+      prev(){
+        this.curpage=this.endPage-1
+        this.recipe_change()
+      },
+      next(){
+        this.curpage=this.endPage+1
+        this.recipe_change()
+      },
+      pageChange(page){
+        this.curpage=page
+        this.recipe_change()
+      }
+    }
+  }).mount("#app")
+</script>
+
+{% endblock %}

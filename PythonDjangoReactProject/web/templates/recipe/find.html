@@ -1,0 +1,97 @@
+{% extends 'main/main.html' %}
+{% block content %}
+
+<div class="wrapper row3" id="app">
+  <main class="container clear">
+    <div class="content">
+      <div id="gallery">
+        <figure>
+          <header class="heading inline">맛집 검색<br>
+              <form method="get" action="/web/recipe/find/" class="inline">
+                <input type="text" class="input-sm" size="20" name="title" value="{{title}}" v-model="fd">
+                <input type="submit" class="btn-sm btn-primary" value="검색" @click="find()">
+              </form>
+          </header>
+          <ul class="nospace clear">
+              <li class="one_quarter first"><a href="#"><img src="{{recipe.poster}}" title="{{recipe.title}}"></a></li>
+          </ul>
+        </figure>
+      </div>
+      <nav class="pagination">
+        <ul>
+          <li><a href="/web/recipe/find/?page={{startPage|add:'-1'}}&title={{title}}">&laquo; Previous</a></li>
+          <li class="current"><a href="/web/recipe/find/?page={{i}}&title={{title}}">{{i}}</a></li>
+          <li><a href="/web/recipe/find/?page={{i}}&title={{title}}">{{i}}</a></li>
+          <li><a href="/web/recipe/find/?page={{endPage|add:'1'}}&title={{title}}">Next &raquo;</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="clear"></div>
+  </main>
+
+  <script>
+  let recipeApp=Vue.createApp({
+    delimiters:['[[',']]'],
+    data(){
+      return {
+        recipe_list:[],
+        curpage:1,
+        startPage:0,
+        endPage:0,
+        totalpage:0,
+        fd:'감자'
+      }
+    },
+
+    mounted(){
+      this.recipe_change()
+    },
+
+    methods:{
+      recipe_change(){
+        axios.get('http://localhost:8000/web/recipe/find_vue/', {
+          params:{
+            page:this.curpage,
+            fd:this.fd
+          }
+        }).then(res=>{
+          console.log(res.data)
+          this.recipe_list=res.data.recipe_list
+          this.curpage=res.data.curpage
+          this.totalpage=res.data.totalpage
+          this.startPage=res.data.startPage
+          this.endPage=res.data.endPage
+        })
+      },
+
+      find(){
+        this.curpage=1
+        this.recipe_change()
+      },
+
+      range(start, end) {
+        let arr=[]
+        let lang=end-start
+        for(let i=0; i<=(end-start); i++) {
+          arr[i]=start
+          start++
+        }
+        return arr
+      },
+      prev(){
+        this.curpage=this.endPage-1
+        this.recipe_change()
+      },
+      next(){
+        this.curpage=this.endPage+1
+        this.recipe_change()
+      },
+      pageChange(page){
+        this.curpage=page
+        this.recipe_change()
+      }
+    }
+  }).mount("#app")
+</script>
+
+{% endblock %}

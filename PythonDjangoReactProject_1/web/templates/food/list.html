@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>맛집</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style type="text/css">
+        .row{
+            margin: 0 auto;
+            width: 960px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            {% for food in food_list %}
+            <div class="col-md-4">
+                <div class="thumbnail">
+                  <a href="/food/before/?fno={{food.fno}}">
+                    <img src="http://www.menupan.com{{food.poster}}" alt="Lights" style="width:100%">
+                    <div class="caption">
+                      <p>{{food.name}}</p>
+                    </div>
+                  </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="height:20px"></div>
+        <div class="row">
+            <div class="text-center">
+                <ul class="pagination">
+                    {% if startPage > 1 %}
+                        <li><a href="/food/?page={{startPage|add:'-1'}}">&laquo;</a></li>
+                        {% endif %}
+                            {% for i in range %}
+                                {% if curpage == i %}
+                                <li class="active"><a href="/food/?page={{i}}">{{i}}</a></li>
+                                {% else %}
+                                <li><a href="/food/?page={{i}}">{{i}}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        {% if endPage < totalpage %}
+                        <li><a href="/food/?page={{endPage|add:'1'}}">&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <div style="height: 20px"></div>
+        <div class="row">
+            <h3>최근 방문 맛집</h3>
+            <hr>
+            <!-- 쿠키 데이터 출력 -->
+            {% for cd in food_cook %}
+            <div class="col-md-4">
+                <div class="thumbnail">
+                  <a href="/food/detail/?fno={{cd.fno}}">
+                    <img src="http://www.menupan.com{{food.poster}}" alt="Lights" style="width:100%">
+                  </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
